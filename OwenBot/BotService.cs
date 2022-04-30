@@ -20,7 +20,7 @@ public class BotService : BackgroundService
         _http = new HttpClient();
         _owen = owenApiClient;
         _logger = logger;
-        var token = configuration["OwenBot:DiscordApiToken"] ?? throw new NotImplementedException();
+        var token = configuration.GetRequiredSection("OwenBot:DiscordApiToken").Get<string>();
         _discord = new DiscordClient(new DiscordConfiguration
         {
             Token = token,
@@ -57,9 +57,7 @@ public class BotService : BackgroundService
             _logger.LogInformation("Connected!");
             return Task.CompletedTask;
         };
-        _logger.LogInformation("Attempting connection");
         await _discord.ConnectAsync();
-        _logger.LogInformation("Done attempting connection");
         await Task.Delay(Timeout.Infinite, stoppingToken);
     }
 }

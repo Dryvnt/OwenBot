@@ -16,7 +16,7 @@ public class HttpOwen : IOwenApiClient
     {
         var responseStream = await _httpClient.GetStreamAsync("random");
         var wows = await JsonSerializer.DeserializeAsync<List<Wow>>(responseStream) ??
-                   throw new NotImplementedException();
+                   throw new InvalidOperationException("Could not deserialize api response from a successful request?");
 
         return wows.First();
     }
