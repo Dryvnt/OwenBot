@@ -14,6 +14,12 @@ public class BotService : BackgroundService
     private readonly ILogger<BotService> _logger;
     private readonly IOwenApiClient _owen;
 
+    private static readonly IReadOnlySet<string> MagicWords = new HashSet<string>
+    {
+        "wow",
+        "car key",
+    };
+
     public BotService(IConfiguration configuration, IOwenApiClient owenApiClient, ILogger<BotService> logger,
         ILoggerFactory loggerFactory)
     {
@@ -32,15 +38,21 @@ public class BotService : BackgroundService
 
     private async Task OnMessageCreated(DiscordClient sender, MessageCreateEventArgs e)
     {
+        // Early check to prevent make dang sure we prevent infinite loops!
         if (e.Author.IsBot)
             return;
-        var isMentioned = e.MentionedUsers.Contains(sender.CurrentUser);
-        var containsWow = e.Message.Content.ToLowerInvariant().Contains("wow");
-        if (!(isMentioned || containsWow))
-        {
-            return;
-        }
 
+        if (e.MentionedUsers.Contains(sender.CurrentUser))
+            await SayWow(e);
+
+        var lowercaseMessage = e.Message.Content.ToLowerInvariant();
+        if (MagicWords.Any(lowercaseMessage.Contains))
+            await SayWow(e);
+
+    }
+
+    private async Task SayWow(MessageCreateEventArgs e)
+    {
         var wow = await _owen.GetRandomAsync();
         var videoStream = await _http.GetStreamAsync(wow.VideoLinkCollection.Video360p);
         await e.Message.RespondAsync(msg =>
