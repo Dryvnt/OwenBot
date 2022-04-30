@@ -2,11 +2,9 @@
 WORKDIR /app
 
 COPY *.sln ./
-COPY OwenApiClient/OwenApiClient.csproj OwenApiClient/OwenApiClient.csproj
 COPY OwenBot/OwenBot.csproj OwenBot/OwenBot.csproj
 RUN dotnet restore
 
-COPY OwenApiClient OwenApiClient
 COPY OwenBot OwenBot
 RUN dotnet publish OwenBot -c Release -o out
 
