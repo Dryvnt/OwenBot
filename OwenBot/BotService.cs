@@ -8,19 +8,22 @@ namespace OwenBot;
 public class BotService : BackgroundService
 {
     private static readonly IReadOnlySet<string> MagicWords = new HashSet<string> { "wow", "car key" };
-
     private readonly DiscordClient _discord;
+
+    private readonly IHostApplicationLifetime _hostApplicationLifetime;
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly ILogger<BotService> _logger;
     private readonly OwenApi _owen;
 
     public BotService(
+        IHostApplicationLifetime hostApplicationLifetime,
         ILogger<BotService> logger,
         IHttpClientFactory httpClientFactory,
         OwenApi owenApi,
         DiscordClient discord
     )
     {
+        _hostApplicationLifetime = hostApplicationLifetime;
         _logger = logger;
         _httpClientFactory = httpClientFactory;
         _owen = owenApi;
@@ -48,8 +51,6 @@ public class BotService : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        var cts = CancellationTokenSource.CreateLinkedTokenSource(stoppingToken);
-
         _discord.MessageCreated += OnMessageCreated;
         _discord.SocketOpened += (s, e) =>
         {
@@ -58,12 +59,14 @@ public class BotService : BackgroundService
         };
         _discord.SocketClosed += (sender, args) =>
         {
-            cts.Cancel();
+            _logger.LogInformation("Socket closed ({}, {})", args.CloseCode, args.CloseMessage);
+            _hostApplicationLifetime.StopApplication();
             return Task.CompletedTask;
         };
         _discord.SocketErrored += (sender, args) =>
         {
-            cts.Cancel();
+            _logger.LogInformation(args.Exception, "Socket error!");
+            _hostApplicationLifetime.StopApplication();
             return Task.CompletedTask;
         };
 
