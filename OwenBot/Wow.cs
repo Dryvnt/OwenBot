@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace OwenApiClient;
+namespace OwenBot;
 
 public record Wow(
     [property: JsonPropertyName("movie")] string Movie,

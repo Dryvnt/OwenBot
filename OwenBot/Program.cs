@@ -1,15 +1,33 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using DSharpPlus;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using OwenApiClient;
+using Microsoft.Extensions.Logging;
 using OwenBot;
 
 using var host = Host.CreateDefaultBuilder(args)
-    .ConfigureServices(services =>
-    {
-        services.AddLogging();
-        services.AddHostedService<BotService>();
-        services.AddSingleton<IOwenApiClient, HttpOwen>();
-    })
+    .ConfigureServices(
+        (builder, services) =>
+        {
+            services.AddLogging();
+            services.AddHttpClient();
+
+            services.AddSingleton(
+                sp => new DiscordClient(
+                    new DiscordConfiguration
+                    {
+                        Token = builder.Configuration.GetRequiredSection("OwenBot:DiscordApiToken").Get<string>(),
+                        TokenType = TokenType.Bot,
+                        Intents = DiscordIntents.DirectMessages | DiscordIntents.GuildMessages,
+                        LoggerFactory = sp.GetRequiredService<ILoggerFactory>(),
+                    }
+                )
+            );
+            services.AddSingleton<OwenApi>();
+
+            services.AddHostedService<BotService>();
+        }
+    )
     .Build();
 
 await host.RunAsync();
