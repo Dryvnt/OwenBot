@@ -31,29 +31,7 @@ public class BotService : BackgroundService
         _httpClientFactory = httpClientFactory;
         _owen = owenApi;
         _discord = discord;
-    }
 
-    private static bool ShouldReply(BaseDiscordClient sender, MessageCreateEventArgs e)
-    {
-        // Early check to prevent make dang sure we prevent infinite loops!
-        if (e.Author.IsBot) return false;
-
-        if (e.MentionedUsers.Contains(sender.CurrentUser)) return true;
-
-        var lowercaseMessage = e.Message.Content.ToLowerInvariant();
-        return MagicWords.Any(lowercaseMessage.Contains);
-    }
-
-    private async Task ReplyWow(DiscordMessage message, CancellationToken stoppingToken)
-    {
-        var wow = await _owen.GetRandomAsync();
-        var httpClient = _httpClientFactory.CreateClient();
-        var videoStream = await httpClient.GetStreamAsync(wow.VideoLinkCollection.Video360P, stoppingToken);
-        await message.RespondAsync(msg => { msg.WithFile("wow.mp4", videoStream); });
-    }
-
-    private void SetupHandlers()
-    {
         _discord.MessageCreated += async (s, e) =>
         {
             if (ShouldReply(s, e)) await _replyToQueue.Writer.WriteAsync(e.Message);
@@ -77,17 +55,40 @@ public class BotService : BackgroundService
         };
     }
 
+    private static bool ShouldReply(BaseDiscordClient sender, MessageCreateEventArgs e)
+    {
+        // Early check to prevent make dang sure we prevent infinite loops!
+        if (e.Author.IsBot) return false;
+
+        if (e.MentionedUsers.Contains(sender.CurrentUser)) return true;
+
+        var lowercaseMessage = e.Message.Content.ToLowerInvariant();
+        return MagicWords.Any(lowercaseMessage.Contains);
+    }
+
+    private async Task ReplyWow(DiscordMessage message, CancellationToken stoppingToken)
+    {
+        var wow = await _owen.GetRandomAsync();
+        var httpClient = _httpClientFactory.CreateClient();
+        var videoStream = await httpClient.GetStreamAsync(wow.VideoLinkCollection.Video360P, stoppingToken);
+        await message.RespondAsync(msg => { msg.WithFile("wow.mp4", videoStream); });
+    }
+
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        SetupHandlers();
+        try
+        {
+            await _discord.ConnectAsync();
 
-        await _discord.ConnectAsync();
-
-        await foreach (var message in _replyToQueue.Reader.ReadAllAsync(stoppingToken)) await ReplyWow(message, stoppingToken);
-
-        // If for some reason we fail in reading a channel,
-        // but it's not because the application is being stopped,
-        // we make sure the application _will_ be stopped.
-        _hostApplicationLifetime.StopApplication();
+            await foreach (var message in _replyToQueue.Reader.ReadAllAsync(stoppingToken))
+                await ReplyWow(message, stoppingToken);
+        }
+        finally
+        {
+            // If for some reason we make it here,
+            // but it's not because the application is being stopped,
+            // we make sure the application _will_ be stopped.
+            _hostApplicationLifetime.StopApplication();
+        }
     }
 }
