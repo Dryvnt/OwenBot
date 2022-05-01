@@ -84,5 +84,10 @@ public class BotService : BackgroundService
         await _discord.ConnectAsync();
 
         await foreach (var message in _replyToQueue.Reader.ReadAllAsync(stoppingToken)) await ReplyWow(message, stoppingToken);
+
+        // If for some reason we fail in reading a channel,
+        // but it's not because the application is being stopped,
+        // we make sure the application _will_ be stopped.
+        _hostApplicationLifetime.StopApplication();
     }
 }
