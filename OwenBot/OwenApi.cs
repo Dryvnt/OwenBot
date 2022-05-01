@@ -12,13 +12,12 @@ public class OwenApi
         _httpClientFactory = httpClientFactory;
     }
 
-    public async Task<Wow> GetRandomAsync()
+    public async Task<Wow> GetRandomAsync(CancellationToken stoppingToken = default)
     {
         var client = _httpClientFactory.CreateClient();
-        var responseStream = await client.GetStreamAsync(new Uri(BaseAddress, "random"));
-        var wows = await JsonSerializer.DeserializeAsync<List<Wow>>(responseStream) ??
-                   throw new InvalidOperationException("Could not deserialize api response from a successful request?");
-
-        return wows.First();
+        var responseStream = await client.GetStreamAsync(new Uri(BaseAddress, "random"), stoppingToken);
+        return await JsonSerializer.DeserializeAsyncEnumerable<Wow>(responseStream, cancellationToken: stoppingToken)
+                   .FirstOrDefaultAsync(stoppingToken) ??
+               throw new InvalidOperationException("Could not deserialize api response from a successful request?");
     }
 }

@@ -68,7 +68,7 @@ public class BotService : BackgroundService
 
     private async Task ReplyWow(DiscordMessage message, CancellationToken stoppingToken)
     {
-        var wow = await _owen.GetRandomAsync();
+        var wow = await _owen.GetRandomAsync(stoppingToken);
         var httpClient = _httpClientFactory.CreateClient();
         var videoStream = await httpClient.GetStreamAsync(wow.VideoLinkCollection.Video360P, stoppingToken);
         await message.RespondAsync(msg => { msg.WithFile("wow.mp4", videoStream); });
