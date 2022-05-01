@@ -1,4 +1,6 @@
-﻿using DSharpPlus;
+﻿using System.Threading.Channels;
+using DSharpPlus;
+using DSharpPlus.Entities;
 using DSharpPlus.EventArgs;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -14,6 +16,7 @@ public class BotService : BackgroundService
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly ILogger<BotService> _logger;
     private readonly OwenApi _owen;
+    private readonly Channel<DiscordMessage> _replyToQueue = Channel.CreateUnbounded<DiscordMessage>();
 
     public BotService(
         IHostApplicationLifetime hostApplicationLifetime,
@@ -30,28 +33,31 @@ public class BotService : BackgroundService
         _discord = discord;
     }
 
-    private async Task OnMessageCreated(DiscordClient sender, MessageCreateEventArgs e)
+    private static bool ShouldReply(BaseDiscordClient sender, MessageCreateEventArgs e)
     {
         // Early check to prevent make dang sure we prevent infinite loops!
-        if (e.Author.IsBot) return;
+        if (e.Author.IsBot) return false;
 
-        if (e.MentionedUsers.Contains(sender.CurrentUser)) await SayWow(e);
+        if (e.MentionedUsers.Contains(sender.CurrentUser)) return true;
 
         var lowercaseMessage = e.Message.Content.ToLowerInvariant();
-        if (MagicWords.Any(lowercaseMessage.Contains)) await SayWow(e);
+        return MagicWords.Any(lowercaseMessage.Contains);
     }
 
-    private async Task SayWow(MessageCreateEventArgs e)
+    private async Task ReplyWow(DiscordMessage message, CancellationToken stoppingToken)
     {
         var wow = await _owen.GetRandomAsync();
         var httpClient = _httpClientFactory.CreateClient();
-        var videoStream = await httpClient.GetStreamAsync(wow.VideoLinkCollection.Video360p);
-        await e.Message.RespondAsync(msg => { msg.WithFile("wow.mp4", videoStream); });
+        var videoStream = await httpClient.GetStreamAsync(wow.VideoLinkCollection.Video360p, stoppingToken);
+        await message.RespondAsync(msg => { msg.WithFile("wow.mp4", videoStream); });
     }
 
-    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    private void SetupHandlers()
     {
-        _discord.MessageCreated += OnMessageCreated;
+        _discord.MessageCreated += async (s, e) =>
+        {
+            if (ShouldReply(s, e)) await _replyToQueue.Writer.WriteAsync(e.Message);
+        };
         _discord.SocketOpened += (s, e) =>
         {
             _logger.LogInformation("Connected!");
@@ -69,8 +75,14 @@ public class BotService : BackgroundService
             _hostApplicationLifetime.StopApplication();
             return Task.CompletedTask;
         };
+    }
+
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    {
+        SetupHandlers();
 
         await _discord.ConnectAsync();
-        await Task.Delay(Timeout.Infinite, stoppingToken);
+
+        await foreach (var message in _replyToQueue.Reader.ReadAllAsync(stoppingToken)) await ReplyWow(message, stoppingToken);
     }
 }
