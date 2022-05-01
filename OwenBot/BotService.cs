@@ -48,7 +48,7 @@ public class BotService : BackgroundService
     {
         var wow = await _owen.GetRandomAsync();
         var httpClient = _httpClientFactory.CreateClient();
-        var videoStream = await httpClient.GetStreamAsync(wow.VideoLinkCollection.Video360p, stoppingToken);
+        var videoStream = await httpClient.GetStreamAsync(wow.VideoLinkCollection.Video360P, stoppingToken);
         await message.RespondAsync(msg => { msg.WithFile("wow.mp4", videoStream); });
     }
 
@@ -58,18 +58,18 @@ public class BotService : BackgroundService
         {
             if (ShouldReply(s, e)) await _replyToQueue.Writer.WriteAsync(e.Message);
         };
-        _discord.SocketOpened += (s, e) =>
+        _discord.SocketOpened += (_, _) =>
         {
             _logger.LogInformation("Connected!");
             return Task.CompletedTask;
         };
-        _discord.SocketClosed += (sender, args) =>
+        _discord.SocketClosed += (_, args) =>
         {
             _logger.LogInformation("Socket closed ({}, {})", args.CloseCode, args.CloseMessage);
             _hostApplicationLifetime.StopApplication();
             return Task.CompletedTask;
         };
-        _discord.SocketErrored += (sender, args) =>
+        _discord.SocketErrored += (_, args) =>
         {
             _logger.LogInformation(args.Exception, "Socket error!");
             _hostApplicationLifetime.StopApplication();

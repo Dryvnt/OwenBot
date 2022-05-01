@@ -1,7 +1,7 @@
 ﻿FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build-env
 WORKDIR /app
 
-COPY *.sln ./
+COPY OwenBot.sln Owenbot.sln
 COPY OwenBot/OwenBot.csproj OwenBot/OwenBot.csproj
 RUN dotnet restore
 
