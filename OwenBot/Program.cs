@@ -20,6 +20,7 @@ using var host = Host.CreateDefaultBuilder(args)
                         TokenType = TokenType.Bot,
                         Intents = DiscordIntents.DirectMessages | DiscordIntents.GuildMessages,
                         LoggerFactory = sp.GetRequiredService<ILoggerFactory>(),
+                        AutoReconnect = true,
                     }
                 )
             );

@@ -44,13 +44,11 @@ public class BotService : BackgroundService
         _discord.SocketClosed += (_, args) =>
         {
             _logger.LogInformation("Socket closed ({}, {})", args.CloseCode, args.CloseMessage);
-            _hostApplicationLifetime.StopApplication();
             return Task.CompletedTask;
         };
         _discord.SocketErrored += (_, args) =>
         {
             _logger.LogInformation(args.Exception, "Socket error!");
-            _hostApplicationLifetime.StopApplication();
             return Task.CompletedTask;
         };
     }
@@ -80,14 +78,26 @@ public class BotService : BackgroundService
         {
             await _discord.ConnectAsync();
 
-            await foreach (var message in _replyToQueue.Reader.ReadAllAsync(stoppingToken))
-                await ReplyWow(message, stoppingToken);
+            while (!stoppingToken.IsCancellationRequested)
+            {
+                try
+                {
+                    await foreach (var message in _replyToQueue.Reader.ReadAllAsync(stoppingToken))
+                        await ReplyWow(message, stoppingToken);
+                }
+                catch (Exception e)
+                {
+                    _logger.LogError(e, "Error during receive-reply loop");
+                    throw;
+                }
+            }
         }
         finally
         {
             // If for some reason we make it here,
             // but it's not because the application is being stopped,
             // we make sure the application _will_ be stopped.
+            _logger.LogInformation("Message receive loop interrupted. Forcing application shutdown");
             _hostApplicationLifetime.StopApplication();
         }
     }
