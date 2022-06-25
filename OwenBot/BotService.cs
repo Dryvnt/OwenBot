@@ -1,4 +1,5 @@
-﻿using System.Threading.Channels;
+﻿using System.Text.RegularExpressions;
+using System.Threading.Channels;
 using DSharpPlus;
 using DSharpPlus.Entities;
 using DSharpPlus.EventArgs;
@@ -9,9 +10,12 @@ namespace OwenBot;
 
 public class BotService : BackgroundService
 {
-    private static readonly IReadOnlySet<string> MagicWords = new HashSet<string> { "wow", "car key" };
-    private readonly DiscordClient _discord;
+    private static readonly Regex MagicWordChecker = new(
+        "wow|car key",
+        RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.IgnoreCase
+    );
 
+    private readonly DiscordClient _discord;
     private readonly IHostApplicationLifetime _hostApplicationLifetime;
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly ILogger<BotService> _logger;
@@ -60,8 +64,7 @@ public class BotService : BackgroundService
 
         if (e.MentionedUsers.Contains(sender.CurrentUser)) return true;
 
-        var lowercaseMessage = e.Message.Content.ToLowerInvariant();
-        return MagicWords.Any(lowercaseMessage.Contains);
+        return MagicWordChecker.IsMatch(e.Message.Content);
     }
 
     private async Task ReplyWow(DiscordMessage message, CancellationToken stoppingToken)
