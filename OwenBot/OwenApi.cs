@@ -4,7 +4,7 @@ namespace OwenBot;
 
 public class OwenApi
 {
-    private static readonly Uri BaseAddress = new("https://owen-wilson-wow-api.onrender.com/wows");
+    private static readonly Uri BaseAddress = new("https://owen-wilson-wow-api.onrender.com/wows/");
     private readonly IHttpClientFactory _httpClientFactory;
 
     public OwenApi(IHttpClientFactory httpClientFactory)
