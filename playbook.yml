@@ -12,8 +12,6 @@
         src: OwenBot/bin/publish/OwenBot
         dest: /usr/local/bin/OwenBot
         mode: "0755"
-      notify:
-        - Restart service
     - name: Write Unit File
       ansible.builtin.template:
         src: templates/owenbot.service.j2
@@ -21,9 +19,6 @@
         mode: "0755"
       vars:
         discord_api_token: "{{ lookup('community.general.bitwarden', 'OwenBot', field='DiscordApiToken') }}"
-      notify:
-        - Restart service
-  handlers:
     - name: Restart service
       ansible.builtin.systemd:
         name: owenbot.service
