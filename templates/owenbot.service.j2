@@ -1,0 +1,12 @@
+[Unit]
+Description=OwenBot
+Requires=network.target
+After=syslog.target network.target
+
+[Service]
+Type=notify
+ExecStart=/usr/local/bin/OwenBot
+Environment=OwenBot__DiscordApiToken={{ discord_api_token[0] }}
+
+[Install]
+WantedBy=multi-user.target

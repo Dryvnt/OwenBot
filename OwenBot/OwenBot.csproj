@@ -3,6 +3,8 @@
     <PropertyGroup>
         <OutputType>Exe</OutputType>
         <TargetFramework>net6.0</TargetFramework>
+        <PublishSingleFile>true</PublishSingleFile>
+        <DebugType>embedded</DebugType>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
     </PropertyGroup>
@@ -12,6 +14,7 @@
         <PackageReference Include="JetBrains.Annotations" Version="2022.1.0"/>
         <PackageReference Include="Microsoft.Extensions.Configuration" Version="6.0.1"/>
         <PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.1"/>
+        <PackageReference Include="Microsoft.Extensions.Hosting.Systemd" Version="6.0.0"/>
         <PackageReference Include="Microsoft.Extensions.Http" Version="6.0.0"/>
         <PackageReference Include="System.Linq.Async" Version="6.0.1"/>
     </ItemGroup>
