@@ -1,9 +1,7 @@
 ﻿using System.Text.Json.Serialization;
-using JetBrains.Annotations;
 
 namespace OwenBot;
 
-[UsedImplicitly]
 public record Wow(
     [property: JsonPropertyName("movie")] string Movie,
     [property: JsonPropertyName("year")] int Year,
@@ -20,7 +18,6 @@ public record Wow(
     [property: JsonPropertyName("audio")] Uri Audio
 );
 
-[UsedImplicitly]
 public record VideoLinkCollection(
     [property: JsonPropertyName("1080p")] Uri Video1080P,
     [property: JsonPropertyName("720p")] Uri Video720P,

@@ -5,7 +5,7 @@ COPY OwenBot.sln Owenbot.sln
 COPY OwenBot/OwenBot.csproj OwenBot/OwenBot.csproj
 RUN dotnet restore
 
-COPY OwenBot OwenBot
+COPY . .
 RUN dotnet publish OwenBot -c Release -o out
 
 FROM mcr.microsoft.com/dotnet/runtime:7.0
