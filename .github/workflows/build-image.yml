@@ -1,4 +1,4 @@
-name: release
+name: build
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
       - "master"
 
 jobs:
-  build_docker:
+  build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -27,6 +27,6 @@ jobs:
           push: true
           platforms: linux/amd64,linux/arm64
           tags: |
-            dryvnt/owenbot:${{ github.ref }}-${{ github.sha }}-${{ github.run_number }}
+            dryvnt/owenbot:${{ github.sha }}-${{ github.run_number }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
