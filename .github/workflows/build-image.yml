@@ -30,6 +30,7 @@ jobs:
         with:
           image: ${{ env.IMAGE_NAME }}
           tags: ${{ env.IMAGE_TAGS }}
+          archs: arm64, amd64
           containerfiles: |
             ./Dockerfile
       
