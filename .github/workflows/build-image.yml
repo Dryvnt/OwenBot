@@ -20,7 +20,7 @@ jobs:
       image-path: ${{ steps.push.registry-path }}
     steps:
       - uses: actions/checkout@v3
-        
+       
       - uses: docker/metadata-action@v4
         id: meta
         with:
@@ -28,7 +28,8 @@ jobs:
             ${{ env.REGISTRY}}/${{ env.IMAGE_NAME }}
           tags: |
             type=ref,event=branch
-            type=sha,prefix=${{ github.run_number }}-
+            type=sha
+            type=raw,value=latest,enable={{is_default_branch}}
         
       - uses: docker/setup-qemu-action@v2
         
