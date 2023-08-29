@@ -1,4 +1,6 @@
-﻿FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build-env
+﻿LABEL org.opencontainers.image.source=https://github.com/dryvnt/owenbot
+
+FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build-env
 WORKDIR /app
 
 COPY OwenBot.sln Owenbot.sln
