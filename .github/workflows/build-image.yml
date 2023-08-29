@@ -16,15 +16,12 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         
-      - name: Install qemu dependency
+      - name: Install build qemu dependency and latest podman
         run: |
           sudo apt-get update
-          sudo apt-get install -y qemu-user-static
+          sudo apt-get -y upgrade
+          sudo apt-get install -y qemu-user-static podman
           
-      - name: Install latest podman
-        run: |
-          bash .github/install_latest_podman.sh
-      
       - name: Buildah Build
         id: build
         uses: redhat-actions/buildah-build@v2
