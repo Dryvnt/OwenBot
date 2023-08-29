@@ -7,10 +7,7 @@ public class OwenApi
     private static readonly Uri BaseAddress = new("https://owen-wilson-wow-api.onrender.com/wows/");
     private readonly IHttpClientFactory _httpClientFactory;
 
-    public OwenApi(IHttpClientFactory httpClientFactory)
-    {
-        _httpClientFactory = httpClientFactory;
-    }
+    public OwenApi(IHttpClientFactory httpClientFactory) => _httpClientFactory = httpClientFactory;
 
     public async Task<Wow> GetRandomAsync(CancellationToken stoppingToken = default)
     {

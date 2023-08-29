@@ -19,7 +19,8 @@ using var host = Host.CreateDefaultBuilder(args)
                     {
                         Token = builder.Configuration.GetRequiredSection("OwenBot:DiscordApiToken").Get<string>(),
                         TokenType = TokenType.Bot,
-                        Intents = DiscordIntents.DirectMessages | DiscordIntents.GuildMessages | DiscordIntents.MessageContents,
+                        Intents = DiscordIntents.DirectMessages | DiscordIntents.GuildMessages |
+                                  DiscordIntents.MessageContents,
                         LoggerFactory = sp.GetRequiredService<ILoggerFactory>(),
                         AutoReconnect = true,
                     }
