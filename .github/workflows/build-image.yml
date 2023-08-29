@@ -11,11 +11,13 @@ permissions:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
-  IMAGE_TAGS: latest ${{ github.run_number }}-${{ github.sha }}
+  IMAGE_TAGS: ${{ github.run_number }}-${{ github.sha }} latest
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    outputs:
+      image-path: ${{ steps.push.registry-path }}
     steps:
       - uses: actions/checkout@v3
         
@@ -35,6 +37,7 @@ jobs:
             ./Dockerfile
       
       - uses: redhat-actions/push-to-registry@v2
+        id: push
         with:
           image: ${{ steps.build.outputs.image }}
           tags: ${{ steps.build.outputs.tags }}
