@@ -32,7 +32,7 @@ jobs:
         with:
           image: ${{ env.IMAGE_NAME }}
           tags: ${{ env.IMAGE_TAGS }}
-          archs: arm64, amd64
+          archs: arm64
           layers: true
           containerfiles: |
             ./Dockerfile
