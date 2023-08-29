@@ -1,14 +1,16 @@
-﻿FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build-env
+﻿FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:7.0 AS build-env
+ARG TARGETARCH
+
 WORKDIR /app
 
 COPY OwenBot.sln Owenbot.sln
 COPY OwenBot/OwenBot.csproj OwenBot/OwenBot.csproj
-RUN dotnet restore
+RUN dotnet restore -a $TARGETARCH
 
 COPY . .
-RUN dotnet publish OwenBot -c Release -o out
+RUN dotnet publish OwenBot -a $TARGETARCH --no-restore -c Release -o out
 
-FROM mcr.microsoft.com/dotnet/runtime:7.0
+FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/runtime:7.0
 LABEL org.opencontainers.image.source=https://github.com/dryvnt/owenbot
 
 COPY --from=build-env /app/out /app
