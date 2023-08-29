@@ -8,7 +8,7 @@ on:
 env:
   REGISTRY: ghcr.io/${{ github.repository_owner }}
   IMAGE_NAME: ${{ github.repository }}
-  IMAGE_TAGS: v1 ${{ github.sha }}
+  IMAGE_TAGS: v1 ${{ github.run_number }}-${{ github.sha }}
 
 jobs:
   build:
