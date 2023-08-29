@@ -28,7 +28,7 @@ jobs:
           version: 1.0
           execute_install_scripts: true
           
-      - name: Buildah Build
+      - name: Build images with Buildah
         id: build
         uses: redhat-actions/buildah-build@v2
         with:
@@ -39,7 +39,8 @@ jobs:
           containerfiles: |
             ./Dockerfile
       
-      - uses: redhat-actions/push-to-registry@v2
+      - name: Push image and tags to registry
+        uses: redhat-actions/push-to-registry@v2
         id: push
         with:
           image: ${{ steps.build.outputs.image }}
