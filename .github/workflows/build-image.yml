@@ -20,20 +20,13 @@ jobs:
       image-path: ${{ steps.push.registry-path }}
     steps:
       - uses: actions/checkout@v3
-          
+
       - name: Install dependencies
         run: |
-          apt-get update
-          apt-get upgrade -y
-          apt-get install -y qemu-user-static podman
-        
-      #- name: Install build qemu dependency and latest podman
-        #uses: awalsh128/cache-apt-pkgs-action@v1
-        #with:
-          #packages: qemu-user-static podman
-          #version: 1.0
-          #execute_install_scripts: true
-          
+          sudo apt-get update
+          sudo apt-get upgrade -y
+          sudo apt-get install -y qemu-user-static podman
+
       - name: Build images with Buildah
         id: build
         uses: redhat-actions/buildah-build@v2
@@ -44,7 +37,7 @@ jobs:
           layers: true
           containerfiles: |
             ./Dockerfile
-      
+
       - name: Push image and tags to registry
         uses: redhat-actions/push-to-registry@v2
         id: push
