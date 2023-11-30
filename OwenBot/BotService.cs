@@ -83,17 +83,13 @@ public class BotService : BackgroundService
 
             while (!stoppingToken.IsCancellationRequested)
             {
-                try
-                {
-                    await foreach (var message in _replyToQueue.Reader.ReadAllAsync(stoppingToken))
-                        await ReplyWow(message, stoppingToken);
-                }
-                catch (Exception e)
-                {
-                    _logger.LogError(e, "Error during receive-reply loop");
-                    throw;
-                }
+                await foreach (var message in _replyToQueue.Reader.ReadAllAsync(stoppingToken))
+                    await ReplyWow(message, stoppingToken);
             }
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error during execute loop");
         }
         finally
         {
