@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using OwenBot;
 
 using var host = Host.CreateDefaultBuilder(args)
+    .UseSystemd()
     .ConfigureServices(
         (builder, services) =>
         {
@@ -16,7 +17,7 @@ using var host = Host.CreateDefaultBuilder(args)
                 sp => new DiscordClient(
                     new DiscordConfiguration
                     {
-                        Token = builder.Configuration.GetRequiredSection("OwenBot:DiscordApiToken").Get<string>(),
+                        Token = builder.Configuration.GetValue<string>("OwenBot:DiscordApiToken"),
                         TokenType = TokenType.Bot,
                         Intents = DiscordIntents.DirectMessages | DiscordIntents.GuildMessages |
                                   DiscordIntents.MessageContents,
