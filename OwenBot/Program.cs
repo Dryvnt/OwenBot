@@ -6,7 +6,6 @@ using Microsoft.Extensions.Logging;
 using OwenBot;
 
 using var host = Host.CreateDefaultBuilder(args)
-    .UseSystemd()
     .ConfigureServices(
         (builder, services) =>
         {
