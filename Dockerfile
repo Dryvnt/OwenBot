@@ -17,4 +17,4 @@ FROM --platform=$TARGETPLATFORM mcr.microsoft.com/dotnet/runtime:8.0
 LABEL org.opencontainers.image.source=https://github.com/dryvnt/owenbot
 
 COPY --from=build-env /out /app
-#ENTRYPOINT ["dotnet", "/app/OwenBot"]
+ENTRYPOINT ["/app/OwenBot"]
