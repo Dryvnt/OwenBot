@@ -19,7 +19,7 @@ jobs:
     outputs:
       image-path: ${{ steps.push.registry-path }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         
       - uses: docker/metadata-action@v5
         id: meta
