@@ -2,16 +2,13 @@
 
 namespace OwenBot;
 
-public class OwenApi
+public class OwenApi(IHttpClientFactory httpClientFactory)
 {
     private static readonly Uri BaseAddress = new("https://owen-wilson-wow-api.onrender.com/wows/");
-    private readonly IHttpClientFactory _httpClientFactory;
-
-    public OwenApi(IHttpClientFactory httpClientFactory) => _httpClientFactory = httpClientFactory;
 
     public async Task<Wow> GetRandomAsync(CancellationToken stoppingToken = default)
     {
-        var client = _httpClientFactory.CreateClient();
+        var client = httpClientFactory.CreateClient();
         var responseStream = await client.GetStreamAsync(new Uri(BaseAddress, "random"), stoppingToken);
         return await JsonSerializer.DeserializeAsyncEnumerable<Wow>(responseStream, cancellationToken: stoppingToken)
                    .FirstOrDefaultAsync(stoppingToken) ??
