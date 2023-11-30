@@ -23,9 +23,12 @@ public partial class BotService(
         // Early check to prevent make dang sure we prevent infinite loops!
         if (e.Author.IsBot) return false;
 
-        if (e.MentionedUsers.Contains(sender.CurrentUser)) return true;
+        // Replies, @owenbot, DMs, etc.
+        var mentionsBot = e.MentionedUsers.Contains(sender.CurrentUser);
+        // Message contains "wow" or "car key"
+        var containsWow = MagicWordRegex().IsMatch(e.Message.Content);
 
-        return MagicWordRegex().IsMatch(e.Message.Content);
+        return mentionsBot || containsWow;
     }
 
     private async Task ReplyWow(DiscordMessage message, CancellationToken stoppingToken)
