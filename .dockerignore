@@ -3,6 +3,4 @@
 .gitignore
 
 Dockerfile
-
-OwenBot/bin
-OwenBot/obj
+artifacts
